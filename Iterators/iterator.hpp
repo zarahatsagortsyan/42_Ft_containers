@@ -61,7 +61,7 @@ namespace ft
     // distance difference_type
     template<class InputIterator>
     typename ft::iterator_traits<InputIterator>::difference_type 
-    distance(InputIterator first, InputIterator last, ft::input_iterator_tag)
+    do_distance(InputIterator first, InputIterator last, ft::input_iterator_tag)
     {
         typename std::iterator_traits<InputIterator>::difference_type result = 0;
         while (first != last) {
@@ -73,13 +73,12 @@ namespace ft
 
     template<class _RandomAccessIterator>
     typename std::iterator_traits<_RandomAccessIterator>::difference_type 
-    distance(_RandomAccessIterator first, _RandomAccessIterator last, std::random_access_iterator_tag)
+    do_distance(_RandomAccessIterator first, _RandomAccessIterator last, std::random_access_iterator_tag)
     {
-        return last - first;
+        return (last - first);
     }
     
     template<class InputIterator>
-    inline
     typename std::iterator_traits<InputIterator>::difference_type 
     distance(InputIterator first, InputIterator last)
     {
@@ -89,7 +88,7 @@ namespace ft
 
     //advance
     template<typename InputIterator, typename Distance>
-    void advance(InputIterator& it, Distance n,
+    void do_advance(InputIterator& it, Distance n,
                     std::input_iterator_tag)
     {
         while (n > 0)
@@ -100,7 +99,7 @@ namespace ft
     }
  
     template<typename InputIterator, typename Distance>
-    void advance(InputIterator& it, Distance n,
+    void do_advance(InputIterator& it, Distance n,
                     std::bidirectional_iterator_tag)
     {
         while (n > 0)
@@ -116,7 +115,7 @@ namespace ft
     }
  
     template<typename It, typename Distance>
-    void advance(It& it, Distance n,
+    void do_advance(It& it, Distance n,
                     std::random_access_iterator_tag)
     {
         it += n;
@@ -128,8 +127,6 @@ namespace ft
         ft::advance(it, ft::iterator_traits<InputIterator>::difference_type(n),
                        typename std::iterator_traits<IInputIteratort>::iterator_category());
     }       
-}
 
-
-
+    
 #endif
