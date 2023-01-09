@@ -1,10 +1,13 @@
 #ifndef FT_ITERATOR_HPP
 #define FT_ITERATOR_HPP
 
+# include <cstddef>
+# include <iterator>
+# include "iterator.hpp"
+
 namespace ft
 {
     //Category tags
-
     struct input_iterator_tag { };
     struct output_iterator_tag { };
     struct forward_iterator_tag : public ft::input_iterator_tag { };
@@ -12,13 +15,8 @@ namespace ft
     struct random_access_iterator_tag : public ft::bidirectional_iterator_tag { };
 
     //Iterator
-    template<
-        class Category,
-        class T,
-        class Distance = std::ptrdiff_t,
-        class Pointer = T*,
-        class Reference = T&
-    > struct iterator
+    template<class Category, class T, class Distance = std::ptrdiff_t, class Pointer = T*, class Reference = T&>
+    struct Iterator
     {
         typedef Category    iterator_category;
         typedef T           value_type;
@@ -41,21 +39,21 @@ namespace ft
     template< class T >
     struct iterator_traits<T*>
     {
-        typedef random_access_iterator_tag  iterator_category;
-        typedef T                           value_type;
-        typedef std::ptrdiff_t              difference_type;
-        typedef T*                          pointer;
-        typedef T&                          reference;
+        typedef ft::random_access_iterator_tag  iterator_category;
+        typedef T                               value_type;
+        typedef std::ptrdiff_t                  difference_type;
+        typedef T*                              pointer;
+        typedef T&                              reference;
     };
 
     template< class T >
     struct iterator_traits<const T*>
     {
-        typedef random_access_iterator_tag  iterator_category;
-        typedef T                           value_type;
-        typedef std::ptrdiff_t              difference_type;
-        typedef T*                          pointer;
-        typedef T&                          reference;
+        typedef ft::random_access_iterator_tag  iterator_category;
+        typedef T                               value_type;
+        typedef std::ptrdiff_t                  difference_type;
+        typedef T*                              pointer;
+        typedef T&                              reference;
     };
 
     // distance difference_type
@@ -72,14 +70,14 @@ namespace ft
     }
 
     template<class _RandomAccessIterator>
-    typename std::iterator_traits<_RandomAccessIterator>::difference_type 
-    do_distance(_RandomAccessIterator first, _RandomAccessIterator last, std::random_access_iterator_tag)
+    typename ft::iterator_traits<_RandomAccessIterator>::difference_type 
+    do_distance(_RandomAccessIterator first, _RandomAccessIterator last, ft::random_access_iterator_tag)
     {
         return (last - first);
     }
     
     template<class InputIterator>
-    typename std::iterator_traits<InputIterator>::difference_type 
+    typename ft::iterator_traits<InputIterator>::difference_type
     distance(InputIterator first, InputIterator last)
     {
         return detail::do_distance(first, last,
@@ -89,7 +87,7 @@ namespace ft
     //advance
     template<typename InputIterator, typename Distance>
     void do_advance(InputIterator& it, Distance n,
-                    std::input_iterator_tag)
+                    ft::input_iterator_tag)
     {
         while (n > 0)
         {
@@ -100,7 +98,7 @@ namespace ft
  
     template<typename InputIterator, typename Distance>
     void do_advance(InputIterator& it, Distance n,
-                    std::bidirectional_iterator_tag)
+                    ft::bidirectional_iterator_tag)
     {
         while (n > 0)
         {
@@ -116,7 +114,7 @@ namespace ft
  
     template<typename It, typename Distance>
     void do_advance(It& it, Distance n,
-                    std::random_access_iterator_tag)
+                    ft::random_access_iterator_tag)
     {
         it += n;
     }
@@ -128,5 +126,5 @@ namespace ft
                        typename std::iterator_traits<IInputIteratort>::iterator_category());
     }       
 
-    
+}
 #endif
