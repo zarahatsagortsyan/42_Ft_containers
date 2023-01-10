@@ -2,6 +2,7 @@
 #define FT_NORMAL_ITERATOR_HPP
 
 #include "iterator.hpp"
+#include "../includes/type_traits.hpp"
 #include <iterator>
 
 namespace ft
@@ -14,28 +15,23 @@ namespace ft
             typedef ft::iterator_traits<Iterator>   traits_type;
         public:
             typedef Iterator    iterator_type;
-            typedef typename iterator_traits<Iterator>::iterator_category	iterator_category;
-            typedef typename iterator_traits<Iterator>::value_type			value_type;
-            typedef typename iterator_traits<Iterator>::difference_type		difference_type;
-            typedef typename iterator_traits<Iterator>::pointer				pointer;
-            typedef typename iterator_traits<Iterator>::reference			reference;
+            typedef typename traits_type::iterator_category	iterator_category;
+            typedef typename traits_type::value_type			value_type;
+            typedef typename traits_type::difference_type		difference_type;
+            typedef typename traits_type::pointer				pointer;
+            typedef typename traits_type::reference			reference;
             
             //Member functions
             normal_iterator() : _base(){}
 
             template<typename Iter>
 			normal_iterator(const normal_iterator<Iter,
-			typename ft::enable_if<(ft::is_same<Iter, typename Container::pointer>::value), Container>::type> &copy) : _base(copy.base()) { }
-            
+			typename ft::enable_if<(ft::is_same<Iter, typename Container::pointer>::value), Container>::type> &copy) : _base(copy.base()) { }            
             explicit normal_iterator(const Iterator &_base) : _base(_base) { }
-
-            template< class Iterator > 
-            normal_iterator( const normal_iterator<Iterator>& other ) : _base(other.base()){}
             
-            template< class Iterator > 
             normal_iterator& operator=( const normal_iterator& other )
             {
-                this->_base = rhs._base;
+                this->_base = other._base;
                 return (*this);
             }
             ~normal_iterator();
@@ -62,7 +58,7 @@ namespace ft
 
             normal_iterator &operator++()
             {
-                ++this->base;
+                ++this->_base;
                 return (*this);
             }
 
@@ -100,7 +96,7 @@ namespace ft
 
             pointer	operator->() const
             {
-                return (ft::addressof(operator*()));
+                return (ft::_addressof(operator*()));
             }
 
             reference	operator[](difference_type n) const

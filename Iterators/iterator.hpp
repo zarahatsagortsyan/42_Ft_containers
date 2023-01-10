@@ -3,7 +3,6 @@
 
 # include <cstddef>
 # include <iterator>
-# include "iterator.hpp"
 
 namespace ft
 {
@@ -59,7 +58,7 @@ namespace ft
     // distance difference_type
     template<class InputIterator>
     typename ft::iterator_traits<InputIterator>::difference_type 
-    do_distance(InputIterator first, InputIterator last, ft::input_iterator_tag)
+    distance(InputIterator first, InputIterator last, ft::input_iterator_tag)
     {
         typename std::iterator_traits<InputIterator>::difference_type result = 0;
         while (first != last) {
@@ -71,7 +70,7 @@ namespace ft
 
     template<class _RandomAccessIterator>
     typename ft::iterator_traits<_RandomAccessIterator>::difference_type 
-    do_distance(_RandomAccessIterator first, _RandomAccessIterator last, ft::random_access_iterator_tag)
+    distance(_RandomAccessIterator first, _RandomAccessIterator last, ft::random_access_iterator_tag)
     {
         return (last - first);
     }
@@ -80,13 +79,13 @@ namespace ft
     typename ft::iterator_traits<InputIterator>::difference_type
     distance(InputIterator first, InputIterator last)
     {
-        return detail::do_distance(first, last,
+        return ft::distance(first, last,
                                 typename std::iterator_traits<InputIterator>::iterator_category());
     }
 
     //advance
     template<typename InputIterator, typename Distance>
-    void do_advance(InputIterator& it, Distance n,
+    void advance(InputIterator& it, Distance n,
                     ft::input_iterator_tag)
     {
         while (n > 0)
@@ -97,7 +96,7 @@ namespace ft
     }
  
     template<typename InputIterator, typename Distance>
-    void do_advance(InputIterator& it, Distance n,
+    void advance(InputIterator& it, Distance n,
                     ft::bidirectional_iterator_tag)
     {
         while (n > 0)
@@ -113,7 +112,7 @@ namespace ft
     }
  
     template<typename It, typename Distance>
-    void do_advance(It& it, Distance n,
+    void advance(It& it, Distance n,
                     ft::random_access_iterator_tag)
     {
         it += n;
@@ -123,7 +122,7 @@ namespace ft
     void advance(InputIterator& it, Distance n)
     {
         ft::advance(it, ft::iterator_traits<InputIterator>::difference_type(n),
-                       typename std::iterator_traits<IInputIteratort>::iterator_category());
+                       typename std::iterator_traits<InputIterator>::iterator_category());
     }       
 
 }

@@ -1,8 +1,8 @@
 #ifndef MEMORY_HPP
 #define MEMORY_HPP
 
-#include "../Iterators/iterator.hpp"
-# include <memory>
+#include "../iterators/iterator.hpp"
+#include <memory>
 
 namespace ft
 {
@@ -34,7 +34,7 @@ namespace ft
         try
         {
             for (; __first != __last; ++__first, ++__cur)
-                __alloc.construct(ft::addressof(*__cur), *__first);
+                __alloc.construct(ft::_addressof(*__cur), *__first);
             return __cur;
         }
         catch(...)
@@ -54,7 +54,7 @@ namespace ft
         try
         {
             for (; __cur != __last; ++__cur)
-            __alloc.construct(ft::addressof(*__cur), __x);
+            __alloc.construct(ft::_addressof(*__cur), __x);
         }
         catch(...)
         {
@@ -74,11 +74,11 @@ namespace ft
         try
         {
             for (; __n > 0; --__n, ++__cur)
-                __alloc.construct(ft::addressof(*__cur), __x);
+                __alloc.construct(ft::_addressof(*__cur), __x);
         }
         catch(...)
         {
-            ft::destroy(__first, __cur, __alloc);
+            ft::_destroy(__first, __cur, __alloc);
             throw;
         }
     }

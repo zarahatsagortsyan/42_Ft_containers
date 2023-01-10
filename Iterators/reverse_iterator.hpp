@@ -3,6 +3,9 @@
 
 #include "iterator.hpp"
 #include "reverse_iterator.hpp"
+#include "../includes/type_traits.hpp"
+#include "../includes/memory.hpp"
+
 
 namespace ft
 {
@@ -10,8 +13,9 @@ namespace ft
     class reverse_iterator
     {
         protected: 
-            ft::Iterator _base;
+            Iterator _base;
         public:
+            typedef Iterator                 iterator_type;
             typedef typename iterator_traits<Iterator>::iterator_category	iterator_category;
             typedef typename iterator_traits<Iterator>::value_type			value_type;
             typedef typename iterator_traits<Iterator>::difference_type		difference_type;
@@ -19,16 +23,16 @@ namespace ft
             typedef typename iterator_traits<Iterator>::reference			reference;
             
             //Member functions
-            constexpr reverse_iterator() : _base(){}
+            // constexpr reverse_iterator() : _base(){}
             explicit reverse_iterator(iterator_type x) : _base(x){}
 
-            template< class Iterator > 
+            //template< class Iterator > 
             reverse_iterator( const reverse_iterator<Iterator>& other ) : _base(other.base()){}
             
-            template< class Iterator > 
-            reverse_iterator& operator=( const reverse_iterator<U>& other )
+            // template< class Iterator > 
+            reverse_iterator& operator=( const reverse_iterator<Iterator>& other )
             {
-                this->_base = rhs._base;
+                this->_base = other._base;
                 return (*this);
             }
             
@@ -69,13 +73,13 @@ namespace ft
             }
             reverse_iterator operator++( int )
             {
-                ft::reverse_iterator temp(*this);
+                reverse_iterator temp(*this);
                 ++(*this);
                 return (temp);
             }
             reverse_iterator operator--( int )
             {
-                ft::reverse_iterator temp(*this);
+                reverse_iterator temp(*this);
                 --(*this);
                 return (temp);
             }
@@ -94,7 +98,7 @@ namespace ft
 
             pointer	operator->() const
             {
-                return (ft::addressof(operator*()));
+                return (ft::_addressof(operator*()));
             }
         };
     }

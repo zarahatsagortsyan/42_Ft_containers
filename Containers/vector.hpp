@@ -1,17 +1,19 @@
 #ifndef FT_VECTOR_HPP
 #define FT_VECTOR_HPP
 
-# include <memory>
-# include <cstddef>
-# include <stdexcept>
-# include <string>
-#include "iterator.hpp"
-#include "normal_iterator.hpp"
-#include "reverse_iterator.hpp"
+#include <memory>
+#include <cstddef>
+#include <stdexcept>
+#include <string>
+#include "../includes/type_traits.hpp"
+#include "../includes/algo.hpp"
+#include "../iterators/iterator.hpp"
+#include "../iterators/normal_iterator.hpp"
+#include "../iterators/reverse_iterator.hpp"
 
 namespace ft
 { 
-    template<typename T,typename Allocator = std::allocator<T>>
+    template<typename T,typename Allocator = std::allocator<T> >
     class vector
     {
         public:
@@ -152,7 +154,7 @@ namespace ft
 
             void resize (size_type n, value_type val = value_type())
             {
-                f (n > this->_size)
+                if (n > this->_size)
 					insert(end(), n - this->_size, val);
 				else if (n < this->_size)
 					erase(end() - (this->_size - n), end());
@@ -165,7 +167,7 @@ namespace ft
 
             bool empty() const
             {
-                return (!this->_size)
+                return (!this->_size);
             }
 
             void reserve (size_type n)
@@ -254,67 +256,147 @@ namespace ft
                 erase(end() - 1);
             }
 
-            iterator insert (iterator position, const value_type& val)
-            {
-                size_type start = std::distance(this->begin(), position);
-                this->insert(position, 1, val);
-                return (this->begin() + start);
-            }
+     iterator	insert(iterator position, const value_type &val)
+			{
+				// offset, to return a valid iterator
+				const size_type	n = position - begin();
+				// building at past-end with enough capacity treated separately
+				if (this->_size != this->_capacity and position == end())
+					this->_alloc.construct(this->_data + this->_size, val);
+				else
+				{
+					// no reallocation needed, thus 1 element will get displaced past-end
+					if (this->_size != this->_capacity)
+					{
+						// displace last element
+						this->_alloc.construct(this->_data + this->_size, *(this->_data + this->_size - 1));
+						// in case if an element being inserted is inside the container, after `position`,
+						// because the reference will be invalidated after elements are shifted to right
+						value_type	val_copy = val;
+						// shift elements after position to the right
+						ft::copy_backward(position.base(), this->_data + this->_size - 1, this->_data + this->_size);
+						// assign to position from copy
+						*position = val_copy;
+					}
+					// reallocation needed
+					else
+					{
+						const size_type	new_capacity = _check_len(1, "vector::insert");
+						const size_type	elems_before = position - begin();
+						pointer			new_data = _allocate(new_capacity);
+						pointer			new_data_end = new_data;
+						try
+						{
+							// elements itself
+							this->_alloc.construct(new_data + elems_before, val);
+							// so that catch block will destroy only the failed object
+							new_data_end = NULL;
+							// import everything before position 
+							new_data_end = ft::_uninitialized_copy_a(this->_data, position.base(), new_data, this->_alloc);
+							new_data_end++;
+							// import everything after position 
+							new_data_end = ft::_uninitialized_copy_a(position.base(), this->_data + this->_size, new_data_end, this->_alloc);
+						}
+						catch (...)
+						{
+							if (!new_data_end)
+								this->_alloc.destroy(new_data + elems_before);
+							else
+								ft::_destroy(new_data, new_data_end, this->_alloc);
+							_deallocate(new_data, new_capacity);
+							throw ;
+						}
+						ft::_destroy(this->_data, this->_data + this->_size, this->_alloc);
+						_deallocate(this->_data, this->_capacity);
+						this->_data = new_data;
+						this->_capacity = new_capacity;
+					}
+				}
+				this->_size++;
+				return (iterator(this->_data + n));
+			}
 
-            void insert (iterator position, size_type n, const value_type& val)
-            {
-                pointer tmp;
-                size_type i;
-                size_type tmpcapacity;
+			void	insert(iterator position, size_type n, const value_type &val)
+			{
+				fill_insert(position, n, val);
+			}
 
-                if (position < this->begin() || position > this->end())
-                    throw std::out_of_range("out of range");
-                difference_type range = n;
-                if (range + this->size() > this->max_size())
-                    throw std::out_of_range("out of range");
-                tmpcapacity = _capacity;
-                if (_size + range > _capacity)
-                    tmpcapacity = (_capacity * 2) > _size + range ?_capacity * 2 : _size + range;
-                tmp = _alloc.allocate(tmpcapacity);
-                try
-                {
-                    for (i = 0; i < static_cast<size_type>(std::distance(this->begin(), position)); i++)
-                    {
-                        _alloc.construct(_alloc.address(tmp[i]), _data[i]);
-                    }
-                    while (n--)
-                    {
-                        _alloc.construct(_alloc.address(tmp[i]), val);
-                        i++;
-                    }
-                    for (size_type j = std::distance(this->begin(), position); j < _size; j++)
-                    {
-                        _alloc.construct(_alloc.address(tmp[i]), _data[j]);
-                        i++;
-                    }
-                }
-                catch(...)
-                {
-                    for (size_type j = 0; j < i; j++)
-                    {
-                        _alloc.destroy(_alloc.address(tmp[j]));
-                    }
-                    _alloc.deallocate(tmp, tmpcapacity);
-                    if (!this->empty())
-                        this->~vector();
-                    throw;
-                }
-                this->~vector();
-                _data = tmp;
-                _capacity = tmpcapacity;
-                _size = i;
-            }
-            
-            template <class InputIterator>
-            void insert (iterator position, InputIterator first, InputIterator last)
-            {
-                insert_dispatch(position, first, last, typename ft::is_integral<InputIterator>::type());
-            }
+			template <class InputIterator>
+			void	insert(iterator position, InputIterator first, InputIterator last)
+			{
+				// disambiguate between a possible fill call
+				insert_dispatch(position, first, last, typename ft::is_integral<InputIterator>::type());
+			}
+
+            	void	fill_insert(iterator position, size_type n, const value_type &val)
+			{
+				if (!n)
+					return ;
+				// no reallocation needed, can work with already allocated memory
+				if (this->_capacity - this->_size >= n)
+				{
+					// in case position points to element inside the container
+					value_type	val_copy = val;
+					const size_type	elems_after = end() - position;
+					// if no filled elements will be constructed beyond size
+					if (elems_after > n)
+					{
+						// displace elements from the end of sequence to the right, beyond size, by constructing objects on uninitialized memory
+						ft::_uninitialized_copy_a(this->_data + this->_size - n, this->_data + this->_size, this->_data + this->_size, this->_alloc);
+						// copying whatever is not displaced into uninitialized memory -- backwards, because it happens to the right
+						ft::copy_backward(position.base(), this->_data + this->_size - n, this->_data + this->_size);
+						// fill in the gaps
+						ft::fill(position.base(), position.base() + n, val_copy);
+					}
+					// filled elements will be constructed beyond size
+					else
+					{
+						// fill in elements past size
+						ft::_uninitialized_fill_n_a(this->_data + this->_size, n - elems_after, val_copy, this->_alloc);
+						// move whatever's from position till size past newly constructed filled elements
+						ft::_uninitialized_copy_a(position.base(), this->_data + this->_size, this->_data + this->_size + n - elems_after, this->_alloc);
+						// now fill in the old range from position till size
+						ft::fill(position.base(), this->_data + this->_size, val_copy);
+					}
+				}
+				// allocation is required
+				else
+				{
+					const size_type	new_capacity = _check_len(n, "vector::fill_insert");
+					const size_type	elems_before = position - begin();
+					pointer			new_data = _allocate(new_capacity);
+					pointer			new_data_end = new_data;
+					try
+					{
+						// construct the filled elements in newly allocated memory
+						ft::_uninitialized_fill_n_a(new_data + elems_before, n, val, this->_alloc);
+						// so that if in next uninitialized_copy_a() an exception is thrown, the section above gets destroyed only
+						new_data_end = NULL;
+						// copy whatever was before the filled elements to new memory
+						new_data_end = ft::_uninitialized_copy_a(this->_data, position.base(), new_data, this->_alloc);
+						// so that if in next uninitialized_copy_a() an exception is thrown, elements constructed above don't get missed
+						new_data_end += n;
+						// copy whatever was after the filled elements to new memory
+						new_data_end = ft::_uninitialized_copy_a(position.base(), this->_data + this->_size, new_data_end, this->_alloc);
+					}
+					catch (...)
+					{
+						if (!new_data_end)
+							ft::_destroy(new_data + elems_before, new_data + elems_before + n, this->_alloc);
+						else
+							ft::_destroy(new_data, new_data_end, this->_alloc);
+						_deallocate(new_data, new_capacity);
+						throw ;
+					}
+					// free old memory
+					ft::_destroy(this->_data, this->_data + this->_size, this->_alloc);
+					_deallocate(this->_data, this->_capacity);
+					// assign new pointers and data
+					this->_capacity = new_capacity;
+					this->_data = new_data;
+				}
+				this->_size += n;
+			}
 
             iterator erase (iterator position)
             {
@@ -377,7 +459,7 @@ namespace ft
 				pointer	result = _allocate(n);
 				try
 				{
-					ft::__uninitialized_copy_a(first, last, result, this->_alloc);
+					ft::_uninitialized_copy_a(first, last, result, this->_alloc);
 					return (result);
 				}
 				catch (...)
@@ -523,10 +605,10 @@ namespace ft
 			void	_range_construct(ForwardIterator first, ForwardIterator last, std::forward_iterator_tag)
 			{
 				const size_type	n = ft::distance(first, last);
-				this->_data = _allocate(check_length(n, "vector::range_construct"));
+				this->_data = _allocate(_check_len(n, "vector::range_construct"));
 				this->_capacity = n;
 				ft::_uninitialized_copy_a(first, last, this->_data, this->_alloc);
-                s->_size = n;
+                this->_size = n;
 			}
 
             void _reallocate(size_type new_capacity)
