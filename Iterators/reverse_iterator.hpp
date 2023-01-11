@@ -36,7 +36,7 @@ namespace ft
                 return (*this);
             }
             
-            ~reverse_iterator();
+            ~reverse_iterator() {}
 
             iterator_type base() const
             {

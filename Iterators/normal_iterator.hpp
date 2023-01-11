@@ -3,47 +3,50 @@
 
 #include "iterator.hpp"
 #include "../includes/type_traits.hpp"
-#include <iterator>
+#include "../includes/memory.hpp"
+#include "../includes/utility.hpp"
+#include "../includes/algo.hpp"
 
 namespace ft
 {
-    template<typename Iterator, typename Container>
+    template<class Iterator, class Container>
     class normal_iterator
     {
         protected: 
-            Iterator _base;
+            Iterator                                _base;
             typedef ft::iterator_traits<Iterator>   traits_type;
         public:
-            typedef Iterator    iterator_type;
+            typedef Iterator                                iterator_type;
             typedef typename traits_type::iterator_category	iterator_category;
-            typedef typename traits_type::value_type			value_type;
-            typedef typename traits_type::difference_type		difference_type;
-            typedef typename traits_type::pointer				pointer;
+            typedef typename traits_type::value_type		value_type;
+            typedef typename traits_type::difference_type	difference_type;
+            typedef typename traits_type::pointer			pointer;
             typedef typename traits_type::reference			reference;
             
             //Member functions
             normal_iterator() : _base(){}
 
+            //template<typename Iter>
+        /*    normal_iterator(const normal_iterator<Iter,
+                typename ft::enable_if<(ft::is_same<Iter, typename ft::Iterator::pointer>::value), Iterator>::type>& copy) : _base(copy.base()) { }*/
             template<typename Iter>
-			normal_iterator(const normal_iterator<Iter,
-			typename ft::enable_if<(ft::is_same<Iter, typename Container::pointer>::value), Container>::type> &copy) : _base(copy.base()) { }            
-            explicit normal_iterator(const Iterator &_base) : _base(_base) { }
+            explicit normal_iterator(const Iter &_base) : _base(_base) { }
             
             normal_iterator& operator=( const normal_iterator& other )
             {
                 this->_base = other._base;
                 return (*this);
             }
-            ~normal_iterator();
+            ~normal_iterator() {}
 
-            iterator_type base() const
+            const iterator_type &base() const
             {
                 return this->_base;
             }
 
-            reference operator*() const
+            reference operator*( ) const
             {
-                return (*this->_base);
+                return *this->_base;
             }
 
             normal_iterator	operator+(difference_type n) const
