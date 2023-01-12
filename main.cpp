@@ -15,17 +15,19 @@ int main()
     start = std::clock();
     std::cout << "**************** vector *****************" << std::endl;
     TESTED_NAMESPACE::vector<int> vec(10, 1);
-     TESTED_NAMESPACE::vector<int> v(vec);
+    //  TESTED_NAMESPACE::vector<int> v(vec);
     TESTED_NAMESPACE::vector<int> vect;
     for (int i = 0; i < 10; i++)
     {
-        vec.push_back(i);
+        vect.push_back(i);
     }
-    TESTED_NAMESPACE::vector<int> vv(vect.begin(), vect.end());
+    std::cout << vect[0] << std::endl;
+    // std::cout << vect.begin() << std::endl;
+    TESTED_NAMESPACE::vector<int> vv(vect.begin(), vect.end()); 
     vv.erase(vv.begin(), vv.begin() + 2);
-    std::cout << "size: " << vv.size() << std::endl;
-    std::cout << "capacity: " << vv.capacity() << std::endl;
-    std::cout << vv[0] << std::endl;
+    // std::cout << "size: " << vv.size() << std::endl;
+    // std::cout << "capacity: " << vv.capacity() << std::endl;
+    // std::cout << vv[0] << std::endl;
     // for (size_t i = 0; i < vv.size(); i++)
     // {
     //     std::cout << "[" << i << "]" << vv[i] << std::endl;
