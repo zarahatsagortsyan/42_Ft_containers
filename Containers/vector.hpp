@@ -327,7 +327,8 @@ namespace ft
         	reference back() { return (*(_data + _size - 1)); }
         	const_reference front() const { return (*_data);}
         	const_reference back() const { return (*(_data + _size - 1));}
-
+		pointer data(){	return (_data);}
+		const_pointer data() const{return (_data);}
             // reference front()
             // {
             //     return (this->_data[0]);
