@@ -65,12 +65,12 @@ namespace ft
             }
             reverse_iterator &operator++()
             {
-                --this->base;
+                this->_base--;
                 return (*this);
             }
             reverse_iterator &operator--()
             {
-                ++this->base;
+                this->_base++;
                 return (*this);
             }
             reverse_iterator operator++( int )
