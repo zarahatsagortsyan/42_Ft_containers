@@ -5,7 +5,8 @@
 # include <exception>
 # include <cstddef>
 # include <climits>
-
+# include "type_traits.hpp"
+# include "algo.hpp"
 
 #define SSTR( x ) static_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()

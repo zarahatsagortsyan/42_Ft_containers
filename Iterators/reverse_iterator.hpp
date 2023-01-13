@@ -47,7 +47,9 @@ namespace ft
 
             reference operator*() const
             {
-                return (*(--iterator_type(this->_base)));
+                // return (*(--iterator_type(this->_base)));
+                iterator_type tmp = _base;
+                return (*(--tmp));
             }
 
             reference operator[]( difference_type n ) const
@@ -75,13 +77,13 @@ namespace ft
             }
             reverse_iterator operator++( int )
             {
-                reverse_iterator temp(*this);
+                reverse_iterator temp = (*this);
                 ++(*this);
                 return (temp);
             }
             reverse_iterator operator--( int )
             {
-                reverse_iterator temp(*this);
+                reverse_iterator temp = (*this);
                 --(*this);
                 return (temp);
             }
@@ -100,7 +102,7 @@ namespace ft
 
             pointer	operator->() const
             {
-                return (ft::_addressof(operator*()));
+                return &(operator*());
             }
         };
     }
