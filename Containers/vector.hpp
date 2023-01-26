@@ -1,10 +1,12 @@
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
+
 #include <memory>
-#include "../iterators/normal_iterator.hpp"
+#include "../iterators/random_access_iterator.hpp"
 #include "../iterators/reverse_iterator.hpp"
 #include "../includes/type_traits.hpp"
 #include "../includes/algo.hpp"
+
 namespace ft
 {
     template <class T, class Alloc = std::allocator<T> >
@@ -202,39 +204,39 @@ namespace ft
             {
                 return (_size==0);
             }
-            // void reserve(size_type n)
-            // {
-            //     if ( n > this->max_size())
-            //         throw std::length_error("greater then max_size");
-            //     if (n > _capacity)
-            //     {
-            //         reallocate(n);
-            //     }
-            // }
-            void reserve (size_type n)
-        	{
-				if (n < _capacity)
-					return ;
-				pointer arr = _alloc.allocate(n);
-				try{
-					for (size_type i = 0; i < _size; i++)
-						_alloc.construct(arr + i, *(_data + i));
-				} catch (std::exception& e){
-					size_type i = 0;
-					while (arr + i != NULL && i < _size){
-						_alloc.destroy(arr + i);
-						i++;
-					}
-					_alloc.deallocate(arr, n);
-					throw;
-				}
-				for (size_type i = 0; i < _size; i++)
-					_alloc.destroy(_data + i);
-				if (_capacity)
-					_alloc.deallocate(_data, _capacity);
-				_capacity = n;
-				_data = arr;
-        	}
+            void reserve(size_type n)
+            {
+                if ( n > this->max_size())
+                    throw std::length_error("greater then max_size");
+                if (n > _capacity)
+                {
+                    reallocate(n);
+                }
+            }
+            // void reserve (size_type n)
+        	// {
+			// 	if (n < _capacity)
+			// 		return ;
+			// 	pointer arr = _alloc.allocate(n);
+			// 	try{
+			// 		for (size_type i = 0; i < _size; i++)
+			// 			_alloc.construct(arr + i, *(_data + i));
+			// 	} catch (std::exception& e){
+			// 		size_type i = 0;
+			// 		while (arr + i != NULL && i < _size){
+			// 			_alloc.destroy(arr + i);
+			// 			i++;
+			// 		}
+			// 		_alloc.deallocate(arr, n);
+			// 		throw;
+			// 	}
+			// 	for (size_type i = 0; i < _size; i++)
+			// 		_alloc.destroy(_data + i);
+			// 	if (_capacity)
+			// 		_alloc.deallocate(_data, _capacity);
+			// 	_capacity = n;
+			// 	_data = arr;
+        	// }
 
         public:
             reference operator[] (size_type n)
@@ -567,6 +569,29 @@ namespace ft
                 std::swap(_capacity, x._capacity);
                 std::swap(_alloc, x._alloc);
             }
+
+            // void    swap (vector& x)
+            // {
+            //     pointer         tmp_data;
+            //     size_type       tmp_size;
+            //     allocator_type  tmp_alloc;
+
+            //     tmp_data = _data;
+            //     _data = x._data;
+            //     x._data = tmp_data;
+
+            //     tmp_size = _size;
+            //     _size = x._size;
+            //     x._size = tmp_size;
+
+            //     tmp_size = _capacity;
+            //     _capacity = x._capacity;
+            //     x._capacity = tmp_size;
+
+            //     tmp_alloc = _alloc;
+            //     _alloc = x._alloc;
+            //     x._alloc = tmp_alloc;
+            // }
             allocator_type get_allocator() const
             {
                 return (_alloc);
@@ -633,10 +658,19 @@ namespace ft
         return (!(lhs < rhs));
     }
     template <class T, class Alloc>
-    void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+        void swap (vector<T,Alloc>& lhs, vector<T,Alloc>& rhs)
     {
-        x.swap(y);
+        ft::vector<T, Alloc> tmp;
+        tmp.swap(lhs);
+        lhs.swap(rhs);
+        rhs.swap(tmp);
     }
 };
+    namespace std{
+        template< class T, class Alloc >
+        void swap(ft::vector<T,Alloc>& lhs, ft::vector<T,Alloc>& rhs ) {
+            lhs.swap(rhs);
+        }
+    }
 
 #endif

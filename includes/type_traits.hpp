@@ -5,35 +5,34 @@ namespace ft
 {
     //https://gcc.gnu.org/onlinedocs/gcc-4.6.3/libstdc++/api/a01090_source.html
     
-    template<typename Tp, Tp v>
-    struct integral_constant
-    {
-        typedef Tp value_type;
-		static const value_type value = v;
-		typedef integral_constant<Tp, v> type;
-		operator value_type() const throw() { return value; }
-    };
+    template <typename T, T v>
+	struct	integral_const
+	{
+		typedef T						value_type;
+		typedef integral_const<T, v>	type;
+		static const T					value = v;
+		operator T() {return v;}
+	};
 
-    //true_type, false_type
-    typedef integral_constant<bool, true> true_type;
-    typedef integral_constant<bool, false> false_type;
+	typedef ft::integral_const<bool, true>	true_type;
+	typedef ft::integral_const<bool, false>	false_type;
 
-    template < class T>
-    struct is_integral : public false_type{};
+    template <typename T> struct	is_integral : ft::integral_const<bool, false> {};
 
-    template <> struct is_integral<bool> : public true_type{};
-    template <> struct is_integral<char> : public true_type{};
-    template <> struct is_integral<int> : public true_type{};
-    template <> struct is_integral< wchar_t> : public true_type{};
-    template <> struct is_integral< signed char> : public true_type{};
-    template <> struct is_integral< long int> : public true_type{};
-    template <> struct is_integral< short int> : public true_type{};
-    template <> struct is_integral< long long int> : public true_type{};
-    template <> struct is_integral< unsigned char> : public true_type{};
-    template <> struct is_integral< unsigned short int> : public true_type{};
-    template <> struct is_integral< unsigned int> : public true_type{};
-    template <> struct is_integral< unsigned long int> : public true_type{};
-    template <> struct is_integral< unsigned long long int> : public true_type{};
+	template <> struct	is_integral<bool> : ft::integral_const<bool, true> {};
+	template <> struct	is_integral<char> : ft::integral_const<char, true> {};
+	template <> struct	is_integral<signed char> : ft::integral_const<signed char, true> {};
+	template <> struct	is_integral<unsigned char> : ft::integral_const<unsigned char, true> {};
+	template <> struct	is_integral<short> : ft::integral_const<short, true> {};
+	template <> struct	is_integral<unsigned short> : ft::integral_const<unsigned short, true> {};
+	template <> struct	is_integral<int> : ft::integral_const<int, true> {};
+	template <> struct	is_integral<unsigned int> : ft::integral_const<unsigned int, true> {};
+	template <> struct	is_integral<long> : ft::integral_const<long, true> {};
+	template <> struct	is_integral<unsigned long> : ft::integral_const<unsigned long, true> {};
+	template <> struct	is_integral<long long> : ft::integral_const<long long, true> {};
+	template <> struct	is_integral<unsigned long long> : ft::integral_const<unsigned long long, true> {};
+	template <> struct	is_integral<wchar_t> : ft::integral_const<wchar_t, true> {};
+	template <> struct	is_integral<char16_t> : ft::integral_const<char16_t, true> {};
 
     //enable_if
     template<bool, typename _Tp = void>
@@ -52,6 +51,17 @@ namespace ft
     template<typename _Tp>
     struct is_same<_Tp, _Tp> : public true_type { };
 
+	template<bool cond, class T>
+    struct constif
+    {
+        typedef T type;
+    };
+
+    template <class T>
+    struct constif<true, T>
+    {
+        typedef const T type;
+    };
 };
 
 #endif

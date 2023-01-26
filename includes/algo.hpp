@@ -4,13 +4,12 @@
 #include <iostream>
 namespace ft
 {
-
-	template<class InputIt1>
-	void swap(InputIt1& ob1, InputIt1& ob2)
+	template <class T>
+	void	swap(T &a, T &b)
 	{
-		InputIt1 tmp = ob1;
-		ob1 = ob2;
-		ob2 = ob1;
+		T	temp(a);
+		a = b;
+		b = temp;
 	}
 
 	//https://en.cppreference.com/w/cpp/algorithm/equal
@@ -167,6 +166,41 @@ namespace ft
 		}
 		return d_last;
 	}
+	
+	template <typename Arg1, typename Arg2, typename Result>
+	struct	binary_function
+	{
+		typedef Arg1 	first_argument_type;
+		typedef Arg2 	second_argument_type;
+		typedef Result	result_type;
+	};
+
+	template <class T>
+    struct less : std::binary_function <T,T,bool> 
+    {
+        bool operator() (const T& x, const T& y) const {return x<y;}
+    };
+
+	template <typename Arg, typename Result>
+	struct	unary_function
+	{
+		typedef Arg		argument_type;
+		typedef Result	result_type;
+	};
+
+	template <typename Pair>
+	struct	select_first : unary_function<Pair, typename Pair::first_type>
+	{
+		typename Pair::first_type	&operator()(Pair &x)
+		{
+			return (x.first);
+		}
+
+		const typename Pair::first_type	&operator()(const Pair &x)
+		{
+			return (x.first);
+		}
+	};
 }
 
 

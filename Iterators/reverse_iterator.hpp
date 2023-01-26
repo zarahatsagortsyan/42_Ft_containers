@@ -6,7 +6,6 @@
 #include "../includes/type_traits.hpp"
 #include "../includes/memory.hpp"
 
-
 namespace ft
 {
     template<typename Iterator>
@@ -22,10 +21,9 @@ namespace ft
             typedef typename iterator_traits<Iterator>::pointer				pointer;
             typedef typename iterator_traits<Iterator>::reference			reference;
             
-
             reverse_iterator() : _base() { }
+            
             //Member functions
-            // constexpr reverse_iterator() : _base(){}
             explicit reverse_iterator(iterator_type x) : _base(x){}
 
             //template< class Iterator > 
